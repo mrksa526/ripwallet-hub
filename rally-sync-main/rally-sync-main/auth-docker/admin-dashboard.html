@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rally Sync - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0f1419;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+        }
+        
+        .login-screen.hidden {
+            display: none;
+        }
+        
+        .login-box {
+            background: rgba(20, 20, 40, 0.95);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+        
+        .login-box p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #ccc;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Dashboard */
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 0;
+        }
+        
+        .logout-btn {
+            padding: 10px 16px;
+            background: #ef4444;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            background: #667eea;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .btn.danger {
+            background: #ef4444;
+        }
+        
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .status-success {
+            color: #4ade80;
+        }
+        
+        .status-failed {
+            color: #f87171;
+        }
+        
+        .add-block-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .add-block-form input {
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>🛡️ Admin Login</h1>
+            <p>Rally Sync Admin Dashboard</p>
+            
+            <form id="adminLoginForm">
+                <div class="error-message" id="loginError"></div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- DASHBOARD -->
+    <div id="dashboard" style="display: none;">
+        <div class="header">
+            <div>
+                <h1>🛡️ Rally Sync Admin Dashboard</h1>
+                <p style="color: #666; font-size: 14px;">Manage logins, blocks, and whitelists</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('logins')">Login History</button>
+            <button class="tab-btn" onclick="switchTab('blocklist')">IP Blocklist</button>
+            <button class="tab-btn" onclick="switchTab('server-whitelist')">Server Whitelist</button>
+            <button class="tab-btn" onclick="switchTab('server-blacklist')">Server Blacklist</button>
+        </div>
+        
+        <!-- LOGIN HISTORY TAB -->
+        <div id="logins" class="tab-content active">
+            <div class="stats" id="loginStats"></div>
+            
+            <div class="controls">
+                <input type="text" id="searchLogins" class="search-box" placeholder="Search by Player ID or Name...">
+                <button class="btn" onclick="refreshLogins()">🔄 Refresh</button>
+            </div>
+            
+            <table id="loginsTable">
+                <thead>
+                    <tr>
+                        <th>Player ID</th>
+                        <th>Player Name</th>
+                        <th>TC Level</th>
+                        <th>Login Time</th>
+                        <th>IP Address</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="loginsBody">
+                    <tr><td colspan="7" class="empty-message">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- BLOCKLIST TAB -->
+        <div id="blocklist" class="tab-content">
+            <div class="add-block-form">
+                <input type="text" id="blockIp" placeholder="IP Address to block">
+                <input type="text" id="blockReason" placeholder="Reason">
+                <button class="btn" onclick="addToBlocklist()">+ Block IP</button>
+            </div>
+            
+            <div class="controls">
+                <input type="text" id="searchBlocklist" class="search-box" placeholder="Search by IP...">
+            </div>
+            
+            <table id="blocklistTable">
+                <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Reason</th>
+                        <th>Blocked Time</th>
+                        <th>Blocked By</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="blocklistBody">
+                    <tr><td colspan="5" class="empty-message">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- SERVER WHITELIST TAB -->
+        <div id="server-whitelist" class="tab-content">
+            <div class="add-block-form">
+                <input type="number" id="whitelistServer" placeholder="Server number">
+                <input type="text" id="whitelistName" placeholder="Server name (optional)">
+                <button class="btn" onclick="addToServerWhitelist()">+ Whitelist Server</button>
+            </div>
+            
+            <table id="whitelistTable">
+                <thead>
+                    <tr>
+                        <th>Server Number</th>
+                        <th>Server Name</th>
+                        <th>Added Time</th>
+                        <th>Added By</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="whitelistBody">
+                    <tr><td colspan="5" class="empty-message">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- SERVER BLACKLIST TAB -->
+        <div id="server-blacklist" class="tab-content">
+            <div class="add-block-form">
+                <input type="number" id="blacklistServer" placeholder="Server number">
+                <input type="text" id="blacklistReason" placeholder="Reason">
+                <button class="btn" onclick="addToServerBlacklist()">+ Blacklist Server</button>
+            </div>
+            
+            <table id="blacklistTable">
+                <thead>
+                    <tr>
+                        <th>Server Number</th>
+                        <th>Reason</th>
+                        <th>Blocked Time</th>
+                        <th>Blocked By</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="blacklistBody">
+                    <tr><td colspan="5" class="empty-message">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        let adminToken = null;
+        
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                adminToken = token;
+                showDashboard();
+                refreshLogins();
+            } else {
+                showLoginScreen();
+            }
+        });
+        
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').style.display = 'none';
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').style.display = 'block';
+        }
+        
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    adminToken = data.token;
+                    localStorage.setItem('adminToken', data.token);
+                    showDashboard();
+                    refreshLogins();
+                } else {
+                    document.getElementById('loginError').textContent = 'Invalid password';
+                    document.getElementById('loginError').classList.add('show');
+                }
+            } catch (err) {
+                document.getElementById('loginError').textContent = 'Login error';
+                document.getElementById('loginError').classList.add('show');
+            }
+        });
+        
+        function logout() {
+            localStorage.removeItem('adminToken');
+            adminToken = null;
+            showLoginScreen();
+            document.getElementById('adminPassword').value = '';
+        }
+        
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (body) options.body = JSON.stringify(body);
+            
+            const response = await fetch(endpoint, options);
+            if (response.status === 401) {
+                logout();
+                return null;
+            }
+            return response.json();
+        }
+        
+        async function refreshLogins() {
+            const data = await apiCall('/api/admin/login-history');
+            if (!data) return;
+            
+            const tbody = document.getElementById('loginsBody');
+            tbody.innerHTML = '';
+            
+            if (data.logins.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No logins yet</td></tr>';
+                return;
+            }
+            
+            data.logins.forEach(login => {
+                const row = document.createElement('tr');
+                const statusClass = login.status === 'SUCCESS' ? 'status-success' : 'status-failed';
+                row.innerHTML = `
+                    <td>${login.player_id}</td>
+                    <td>${login.player_name || '-'}</td>
+                    <td>${login.tc_level || '-'}</td>
+                    <td>${new Date(login.login_time).toLocaleString()}</td>
+                    <td>${login.ip_address}</td>
+                    <td>${login.location}</td>
+                    <td class="${statusClass}">${login.status}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        async function refreshBlocklist() {
+            const data = await apiCall('/api/admin/blocklist');
+            if (!data) return;
+            
+            const tbody = document.getElementById('blocklistBody');
+            tbody.innerHTML = '';
+            
+            if (data.blocklist.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No blocked IPs</td></tr>';
+                return;
+            }
+            
+            data.blocklist.forEach(block => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${block.ip_address}</td>
+                    <td>${block.reason}</td>
+                    <td>${new Date(block.blocked_time).toLocaleString()}</td>
+                    <td>${block.blocked_by}</td>
+                    <td><button class="btn danger" onclick="removeFromBlocklist('${block.ip_address}')">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        async function addToBlocklist() {
+            const ip = document.getElementById('blockIp').value.trim();
+            const reason = document.getElementById('blockReason').value.trim();
+            
+            if (!ip) {
+                alert('Please enter an IP address');
+                return;
+            }
+            
+            const result = await apiCall('/api/admin/blocklist', 'POST', {
+                ip_address: ip,
+                reason: reason || 'Manual block',
+                blocked_by: 'ADMIN'
+            });
+            
+            if (result?.success) {
+                document.getElementById('blockIp').value = '';
+                document.getElementById('blockReason').value = '';
+                refreshBlocklist();
+            } else {
+                alert(result?.error || 'Failed to block IP');
+            }
+        }
+        
+        async function removeFromBlocklist(ip) {
+            if (!confirm(`Remove ${ip} from blocklist?`)) return;
+            
+            const result = await apiCall('/api/admin/blocklist', 'DELETE', {
+                ip_address: ip
+            });
+            
+            if (result?.success) {
+                refreshBlocklist();
+            }
+        }
+        
+        async function refreshServerWhitelist() {
+            const data = await apiCall('/api/admin/server-whitelist');
+            if (!data) return;
+            
+            const tbody = document.getElementById('whitelistBody');
+            tbody.innerHTML = '';
+            
+            if (data.whitelist.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No whitelisted servers</td></tr>';
+                return;
+            }
+            
+            data.whitelist.forEach(server => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${server.server_number}</td>
+                    <td>${server.server_name}</td>
+                    <td>${new Date(server.added_time).toLocaleString()}</td>
+                    <td>${server.added_by}</td>
+                    <td><button class="btn danger" onclick="removeFromServerWhitelist(${server.server_number})">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        async function addToServerWhitelist() {
+            const server = document.getElementById('whitelistServer').value.trim();
+            const name = document.getElementById('whitelistName').value.trim();
+            
+            if (!server) {
+                alert('Please enter a server number');
+                return;
+            }
+            
+            const result = await apiCall('/api/admin/server-whitelist', 'POST', {
+                server_number: parseInt(server),
+                server_name: name || `Server ${server}`,
+                added_by: 'ADMIN'
+            });
+            
+            if (result?.success) {
+                document.getElementById('whitelistServer').value = '';
+                document.getElementById('whitelistName').value = '';
+                refreshServerWhitelist();
+            } else {
+                alert(result?.error || 'Failed to whitelist server');
+            }
+        }
+        
+        async function removeFromServerWhitelist(server) {
+            if (!confirm(`Remove server ${server} from whitelist?`)) return;
+            
+            const result = await apiCall('/api/admin/server-whitelist', 'DELETE', {
+                server_number: server
+            });
+            
+            if (result?.success) {
+                refreshServerWhitelist();
+            }
+        }
+        
+        async function refreshServerBlacklist() {
+            const data = await apiCall('/api/admin/server-blacklist');
+            if (!data) return;
+            
+            const tbody = document.getElementById('blacklistBody');
+            tbody.innerHTML = '';
+            
+            if (data.blacklist.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No blacklisted servers</td></tr>';
+                return;
+            }
+            
+            data.blacklist.forEach(server => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${server.server_number}</td>
+                    <td>${server.reason}</td>
+                    <td>${new Date(server.blocked_time).toLocaleString()}</td>
+                    <td>${server.blocked_by}</td>
+                    <td><button class="btn danger" onclick="removeFromServerBlacklist(${server.server_number})">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        async function addToServerBlacklist() {
+            const server = document.getElementById('blacklistServer').value.trim();
+            const reason = document.getElementById('blacklistReason').value.trim();
+            
+            if (!server) {
+                alert('Please enter a server number');
+                return;
+            }
+            
+            const result = await apiCall('/api/admin/server-blacklist', 'POST', {
+                server_number: parseInt(server),
+                reason: reason || 'No reason provided',
+                blocked_by: 'ADMIN'
+            });
+            
+            if (result?.success) {
+                document.getElementById('blacklistServer').value = '';
+                document.getElementById('blacklistReason').value = '';
+                refreshServerBlacklist();
+            } else {
+                alert(result?.error || 'Failed to blacklist server');
+            }
+        }
+        
+        async function removeFromServerBlacklist(server) {
+            if (!confirm(`Remove server ${server} from blacklist?`)) return;
+            
+            const result = await apiCall('/api/admin/server-blacklist', 'DELETE', {
+                server_number: server
+            });
+            
+            if (result?.success) {
+                refreshServerBlacklist();
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tab === 'logins') refreshLogins();
+            if (tab === 'blocklist') refreshBlocklist();
+            if (tab === 'server-whitelist') refreshServerWhitelist();
+            if (tab === 'server-blacklist') refreshServerBlacklist();
+        }
+    </script>
+</body>
+</html>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0f1419;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            background: #667eea;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .btn.danger {
+            background: #ef4444;
+        }
+        
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .status-success {
+            color: #4ade80;
+        }
+        
+        .status-failed {
+            color: #f87171;
+        }
+        
+        .add-block-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .add-block-form input {
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ Rally Sync Admin Dashboard</h1>
+        <p style="color: #666; font-size: 14px;">Monitor logins and manage IP blocklist</p>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('logins')">Login History</button>
+        <button class="tab-btn" onclick="switchTab('whitelist')">Player Whitelist</button>
+        <button class="tab-btn" onclick="switchTab('blocklist')">IP Blocklist</button>
+        <button class="tab-btn" onclick="switchTab('server-whitelist')">Server Whitelist</button>
+        <button class="tab-btn" onclick="switchTab('server-blacklist')">Server Blacklist</button>
+    </div>
+    
+    <!-- LOGIN HISTORY TAB -->
+    <div id="logins" class="tab-content active">
+        <div class="stats" id="loginStats"></div>
+        
+        <div class="controls">
+            <input type="text" id="searchLogins" class="search-box" placeholder="Search by Player ID or Name...">
+            <button class="btn" onclick="refreshLogins()">🔄 Refresh</button>
+        </div>
+        
+        <table id="loginsTable">
+            <thead>
+                <tr>
+                    <th>Player ID</th>
+                    <th>Player Name</th>
+                    <th>TC Level</th>
+                    <th>Login Time</th>
+                    <th>IP Address</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="loginsBody">
+                <tr><td colspan="7" class="empty-message">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- WHITELIST TAB -->
+    <div id="whitelist" class="tab-content">
+        <div class="add-block-form">
+            <input type="number" id="whitelistPlayerId" placeholder="Player ID">
+            <input type="text" id="whitelistPlayerName" placeholder="Player Name">
+            <input type="number" id="whitelistServer" placeholder="Server Number">
+            <input type="text" id="whitelistReason" placeholder="Reason (optional)" style="flex: 1; min-width: 150px;">
+            <button class="btn" onclick="addToWhitelist()">+ Whitelist</button>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="searchWhitelist" class="search-box" placeholder="Search by Player ID or Name...">
+        </div>
+        
+        <table id="whitelistTable">
+            <thead>
+                <tr>
+                    <th>Player ID</th>
+                    <th>Player Name</th>
+                    <th>Server</th>
+                    <th>Approved Time</th>
+                    <th>Approved By</th>
+                    <th>Reason</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="whitelistBody">
+                <tr><td colspan="7" class="empty-message">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+        <div class="add-block-form">
+            <input type="text" id="blockIp" placeholder="IP Address to block">
+            <input type="text" id="blockReason" placeholder="Reason">
+            <button class="btn" onclick="addToBlocklist()">+ Block IP</button>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="searchBlocklist" class="search-box" placeholder="Search by IP...">
+        </div>
+        
+        <table id="blocklistTable">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Reason</th>
+                    <th>Blocked Time</th>
+                    <th>Blocked By</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="blocklistBody">
+                <tr><td colspan="5" class="empty-message">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        async function refreshLogins() {
+            try {
+                const response = await fetch('/api/admin/login-history');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('loginsBody');
+                tbody.innerHTML = '';
+                
+                if (data.logins.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No logins yet</td></tr>';
+                    return;
+                }
+                
+                data.logins.forEach(login => {
+                    const row = document.createElement('tr');
+                    const statusClass = login.status === 'SUCCESS' ? 'status-success' : 'status-failed';
+                    row.innerHTML = `
+                        <td>${login.player_id}</td>
+                        <td>${login.player_name || '-'}</td>
+                        <td>${login.tc_level || '-'}</td>
+                        <td>${new Date(login.login_time).toLocaleString()}</td>
+                        <td>${login.ip_address}</td>
+                        <td>${login.location}</td>
+                        <td class="${statusClass}">${login.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Failed to load logins:', err);
+            }
+        }
+        
+        async function refreshWhitelist() {
+            try {
+                const response = await fetch('/api/admin/whitelist');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('whitelistBody');
+                tbody.innerHTML = '';
+                
+                if (data.whitelist.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No whitelisted players</td></tr>';
+                    return;
+                }
+                
+                data.whitelist.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.player_id}</td>
+                        <td>${entry.player_name || '-'}</td>
+                        <td>${entry.server_number}</td>
+                        <td>${new Date(entry.approved_time).toLocaleString()}</td>
+                        <td>${entry.approved_by}</td>
+                        <td>${entry.reason || '-'}</td>
+                        <td><button class="btn danger" onclick="removeFromWhitelist(${entry.player_id})">Remove</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Failed to load whitelist:', err);
+            }
+        }
+        
+        async function addToWhitelist() {
+            const playerId = document.getElementById('whitelistPlayerId').value.trim();
+            const playerName = document.getElementById('whitelistPlayerName').value.trim();
+            const server = document.getElementById('whitelistServer').value.trim();
+            const reason = document.getElementById('whitelistReason').value.trim();
+            
+            if (!playerId || !playerName || !server) {
+                alert('Please enter Player ID, Name, and Server');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/whitelist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        player_id: parseInt(playerId),
+                        player_name: playerName,
+                        server_number: parseInt(server),
+                        approved_by: 'ADMIN',
+                        reason: reason || ''
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('whitelistPlayerId').value = '';
+                    document.getElementById('whitelistPlayerName').value = '';
+                    document.getElementById('whitelistServer').value = '';
+                    document.getElementById('whitelistReason').value = '';
+                    refreshWhitelist();
+                } else {
+                    const data = await response.json();
+                    alert(data.error === 'PLAYER_ALREADY_WHITELISTED' ? 'Player already whitelisted' : 'Failed to whitelist player');
+                }
+            } catch (err) {
+                console.error('Failed to whitelist player:', err);
+            }
+        }
+        
+        async function removeFromWhitelist(playerId) {
+            if (!confirm(`Remove player ${playerId} from whitelist?`)) return;
+            
+            try {
+                const response = await fetch('/api/admin/whitelist', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player_id: playerId })
+                });
+                
+                if (response.ok) {
+                    refreshWhitelist();
+                }
+            } catch (err) {
+                console.error('Failed to remove player:', err);
+            }
+        }
+        
+        async function refreshBlocklist() {
+            try {
+                const response = await fetch('/api/admin/blocklist');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('blocklistBody');
+                tbody.innerHTML = '';
+                
+                if (data.blocklist.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No blocked IPs</td></tr>';
+                    return;
+                }
+                
+                data.blocklist.forEach(block => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${block.ip_address}</td>
+                        <td>${block.reason}</td>
+                        <td>${new Date(block.blocked_time).toLocaleString()}</td>
+                        <td>${block.blocked_by}</td>
+                        <td><button class="btn danger" onclick="removeFromBlocklist('${block.ip_address}')">Remove</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Failed to load blocklist:', err);
+            }
+        }
+        
+        async function addToBlocklist() {
+            const ip = document.getElementById('blockIp').value.trim();
+            const reason = document.getElementById('blockReason').value.trim();
+            
+            if (!ip) {
+                alert('Please enter an IP address');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/blocklist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ip_address: ip,
+                        reason: reason || 'Manual block',
+                        blocked_by: 'ADMIN'
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('blockIp').value = '';
+                    document.getElementById('blockReason').value = '';
+                    refreshBlocklist();
+                } else {
+                    alert('Failed to block IP');
+                }
+            } catch (err) {
+                console.error('Failed to block IP:', err);
+            }
+        }
+        
+        async function removeFromBlocklist(ip) {
+            if (!confirm(`Remove ${ip} from blocklist?`)) return;
+            
+            try {
+                const response = await fetch('/api/admin/blocklist', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip_address: ip })
+                });
+                
+                if (response.ok) {
+                    refreshBlocklist();
+                }
+            } catch (err) {
+                console.error('Failed to remove IP:', err);
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tab === 'logins') refreshLogins();
+            if (tab === 'whitelist') refreshWhitelist();
+            if (tab === 'blocklist') refreshBlocklist();
+        }
+        
+        // Initial load
+        refreshLogins();
+    </script>
+</body>
+</html>

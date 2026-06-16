@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  rally-sync:
+    image: gentoonix/rally-sync:latest
+    container_name: rally-sync
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app-auth.py
+      - RALLY_ADMIN_PASSWORD=${RALLY_ADMIN_PASSWORD:-changeme}
+    volumes:
+      - rally-data:/app/data
+    restart: unless-stopped
+    networks:
+      - rally-network
+
+volumes:
+  rally-data:
+    driver: local
+
+networks:
+  rally-network:
+    driver: bridge

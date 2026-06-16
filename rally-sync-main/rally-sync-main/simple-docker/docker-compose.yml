@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  rally-sync:
+    image: gentoonix/rally-sync:simple
+    container_name: rally-sync
+    ports:
+      - "5001:5000"
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
